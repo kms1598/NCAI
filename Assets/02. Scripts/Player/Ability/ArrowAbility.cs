@@ -1,0 +1,39 @@
+using UnityEngine;
+
+public class ArrowAbility : IAbility
+{
+    public ActivationType Activation => ActivationType.Instant;
+
+    public float GaugeCost => 5f;
+
+    public float DrainPerSecond => 0f;
+
+    public bool ProvidesStats => false;
+
+    public bool IsActive => false;
+
+
+    public MovementStats GetStats()
+    {
+        return default;
+    }
+
+    public void OnActiveUpdate(PlayerController pc) { }
+
+    public void OnEquip(PlayerController pc) { }
+    public void Fire(PlayerController pc)
+    {
+        if (pc.arrowPrefab == null) return;
+
+        Vector3 dir = pc.aimDir;
+        dir.y = 0;
+        dir.Normalize();
+
+        var arrow = Object.Instantiate(pc.arrowPrefab, pc.transform.position + dir, Quaternion.LookRotation(dir));
+        arrow.GetComponent<Transform>().position += Vector3.up;
+        var rb = arrow.GetComponent<Rigidbody>();
+        if (rb) rb.linearVelocity = dir * 10f;
+    }
+
+    public void OnUnequip(PlayerController pc) { }
+}
