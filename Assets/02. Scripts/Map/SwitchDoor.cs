@@ -12,8 +12,8 @@ public class SwitchDoor : MonoBehaviour, ISwitchable
     public void SetState()
     {
         isOpen = true;
-        /*closedDoor.SetActive(false);
-        openDoor.SetActive(true);*/
+        closedDoor.SetActive(false);
+        openDoor.SetActive(true);
     }
 
 

@@ -4,8 +4,7 @@ using UnityEngine;
 /// PlayerController Animator 연동.
 /// Animator Controller에 아래 파라미터를 만들어 두세요.
 /// </summary>
-/// - Speed (float), MoveX (float), MoveZ (float)
-/// - IsGrounded (bool), VelocityY (float)
+/// - Speed (float), MoveX (float), MoveZ (float), MoveSpeedMultiplier (float)
 /// - Jump, Dash, Land, Shoot, Transform, Respawn (trigger)
 /// - AbilityIndex (int), IsCrawling (bool), IsPlatform (bool)
 [RequireComponent(typeof(PlayerController))]
@@ -14,8 +13,7 @@ public class PlayerAnimator : MonoBehaviour
     static readonly int Speed = Animator.StringToHash("Speed");
     static readonly int MoveX = Animator.StringToHash("MoveX");
     static readonly int MoveZ = Animator.StringToHash("MoveZ");
-    static readonly int IsGrounded = Animator.StringToHash("IsGrounded");
-    static readonly int VelocityY = Animator.StringToHash("VelocityY");
+    static readonly int MoveSpeedMultiplier = Animator.StringToHash("MoveSpeedMultiplier");
     static readonly int Jump = Animator.StringToHash("Jump");
     static readonly int Dash = Animator.StringToHash("Dash");
     static readonly int Land = Animator.StringToHash("Land");
@@ -47,14 +45,21 @@ public class PlayerAnimator : MonoBehaviour
         Vector3 localMove = transform.InverseTransformDirection(worldMove);
 
         // MoveX / MoveZ — 2D 블렌드 트리 (앞·뒤·좌·우 걷기)
+        // 방향 배율이 아닌 입력 방향을 넣어야 해당 클립이 온전한 가중치로 재생됩니다.
         anim.SetFloat(MoveX, localMove.x, moveDampTime, Time.deltaTime);
         anim.SetFloat(MoveZ, localMove.z, moveDampTime, Time.deltaTime);
         // Speed — Idle / Move 전환용
         anim.SetFloat(Speed, worldMove.magnitude, moveDampTime, Time.deltaTime);
+        // 실제 이동 속도가 느려진 만큼 재생 속도를 낮춰 발 미끄러짐을 줄입니다.
+        anim.SetFloat(MoveSpeedMultiplier, GetMoveSpeedMultiplier(worldMove), moveDampTime, Time.deltaTime);
+    }
 
-        // Jump / Fall — 지상 여부·수직 속도
-        anim.SetBool(IsGrounded, pc.cc.isGrounded);
-        anim.SetFloat(VelocityY, pc.velocity.y);
+    float GetMoveSpeedMultiplier(Vector3 worldMove)
+    {
+        float rawSpeed = worldMove.magnitude;
+        if (rawSpeed < 0.0001f) return 1f;
+
+        return pc.GetDirectionalMove().magnitude / rawSpeed;
     }
 
     /// <summary>Jump — 점프 시작 (Ground → Jump)</summary>

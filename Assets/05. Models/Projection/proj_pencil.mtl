@@ -1,0 +1,41 @@
+# 무명극 연필 재질 — 전부 무광 (§5-5 Metallic 0, Roughness 높게)
+
+newmtl pencil_body
+Kd 0.5880 0.4780 0.4940
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+Ns 1.0
+d 1.0
+illum 1
+
+newmtl pencil_wood
+Kd 0.7690 0.6900 0.6510
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+Ns 1.0
+d 1.0
+illum 1
+
+newmtl pencil_lead
+Kd 0.2270 0.2040 0.2120
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+Ns 1.0
+d 1.0
+illum 1
+
+newmtl pencil_ferrule
+Kd 0.5730 0.5410 0.5180
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+Ns 1.0
+d 1.0
+illum 1
+
+newmtl pencil_eraser
+Kd 0.6900 0.5180 0.5330
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+Ns 1.0
+d 1.0
+illum 1

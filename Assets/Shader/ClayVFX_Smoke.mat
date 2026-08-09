@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ClayVFX_Smoke
+  m_Shader: {fileID: 4800000, guid: 1eacfc5c89ba6a74f820a4b528d0a05a, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _ALPHASOURCE_LUMINANCE
+  - _BLEND_ADDITIVE
+  - _FLIPBOOK_BLEND_ON
+  - _SOFTPARTICLES_ON
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _DissolveTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 8411efa1a780ac54ebb91b17c117cc47, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AlphaClip: 0
+    - _AlphaSource: 1
+    - _BandSteps: 3
+    - _BandingStrength: 0.35
+    - _Blend: 1
+    - _CameraFadeFar: 0.5
+    - _CameraFadeNear: 0
+    - _ClayLighting: 0
+    - _ColorLift: 0.1
+    - _ColorRestore: 1
+    - _Cull: 0
+    - _Cutoff: 0.5
+    - _DissolveAmount: 0
+    - _DissolveEdgeWidth: 0.08
+    - _EmissionStrength: 1
+    - _Flipbook: 0
+    - _FlipbookBlend: 1
+    - _FlipbookColumns: 4
+    - _FlipbookFPS: 12
+    - _FlipbookRows: 1
+    - _LightingInfluence: 0.45
+    - _LumAlphaHigh: 0.35
+    - _LumAlphaLow: 0.02
+    - _PaletteWarmth: 0.2
+    - _ShadowLevel: 0.62
+    - _ShadowSoftness: 0.2
+    - _SoftParticleFade: 0.8
+    - _SoftParticles: 1
+    - _WrapAmount: 0.65
+    - _WrapContrast: 1.4
+    - _ZWrite: 0
+    m_Colors:
+    - _BaseColor: {r: 0.5660378, g: 0.45141238, b: 0.34442863, a: 1}
+    - _DissolveEdgeColor: {r: 1, g: 0.6, b: 0.3, a: 1}
+    - _HighlightTint: {r: 1, g: 1, b: 1, a: 1}
+    - _ShadowColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

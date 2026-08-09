@@ -31,6 +31,7 @@ public class PlayerAim : MonoBehaviour
     {
         HasValidAim = false;
 
+        if (pc == null || !pc.CanControl) return;
         if (pc.activeCamera == null) return;
 
         if(cachedCamTransform != pc.activeCamera)
