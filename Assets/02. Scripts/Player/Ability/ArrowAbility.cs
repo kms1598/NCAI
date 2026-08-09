@@ -33,6 +33,8 @@ public class ArrowAbility : IAbility
         arrow.GetComponent<Transform>().position += Vector3.up;
         var rb = arrow.GetComponent<Rigidbody>();
         if (rb) rb.linearVelocity = dir * 10f;
+        // Anim: Shoot — 화살 발사
+        pc.Anim?.PlayShoot();
     }
 
     public void OnUnequip(PlayerController pc) { }

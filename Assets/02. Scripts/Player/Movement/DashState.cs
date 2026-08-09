@@ -20,6 +20,8 @@ public class DashState : PlayerState
         pc.velocity = new Vector3(dashVelocity.x, 0f, dashVelocity.z);
 
         PlayerController.instance.MarkDashUsedTime();
+        // Anim: Dash — 대시 연출
+        pc.Anim?.PlayDash();
     }
 
     public override void Update()

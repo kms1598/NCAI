@@ -20,5 +20,7 @@ public class PlayerRespawn : MonoBehaviour
         transform.position = currentSpawnPos;
         PlayerController.instance.cc.enabled = true;
         PlayerController.instance.ResetVelocity();
+        // Anim: Respawn — 리스폰
+        PlayerController.instance.Anim?.PlayRespawn();
     }
 }

@@ -45,6 +45,8 @@ public class AbilityManager : MonoBehaviour
         selectedIndex = 0;
         currentIndex = 0;
         slots[currentIndex].OnEquip(PlayerController.instance);
+        // Anim: AbilityIndex — 초기 형태(None)
+        PlayerController.instance.Anim?.SetAbilityIndex(currentIndex);
     }
 
     void Update()
@@ -109,6 +111,8 @@ public class AbilityManager : MonoBehaviour
         currentIndex = selectedIndex;
         slots[currentIndex].OnEquip(PlayerController.instance);
         RecalStats();
+        // Anim: Transform + AbilityIndex — 능력 형태 전환
+        PlayerController.instance.Anim?.PlayTransform(currentIndex);
         OnTransformed?.Invoke(currentIndex);
     }
 

@@ -53,5 +53,7 @@ public class PlatformAbility : IAbility
             pc.platformPrefab.SetActive(false);
             pc.gameObject.layer = LayerMask.NameToLayer("Player");
         }
+        // Anim: Platform — 발판 모드 on·off
+        pc.Anim?.SetPlatform(on);
     }
 }

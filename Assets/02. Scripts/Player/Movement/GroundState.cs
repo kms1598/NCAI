@@ -24,6 +24,8 @@ public class GroundState : PlayerState
         if (pc.jumpPressed && pc.Stats.canJump)
         {
             pc.velocity.y = MathF.Sqrt(2f * -pc.gravity * pc.Stats.jumpHeight);
+            // Anim: Jump — 점프 시작
+            pc.Anim?.PlayJump();
             pc.TransitionTo(pc.Jump);
             return;
         }

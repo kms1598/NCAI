@@ -1,6 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// 플레이어 이동 컨트롤러.
+/// Animator 연동은 <see cref="PlayerAnimator"/> + 각 상태/능력 호출 지점 주석 참고.
+/// </summary>
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController instance;
@@ -14,6 +18,7 @@ public class PlayerController : MonoBehaviour
     public MovementStats Stats => currentStats;
 
     public CharacterController cc;
+    public PlayerAnimator Anim { get; private set; }
     public Vector2 moveInput;
     public Vector3 velocity;
     public Vector3 aimDir;
@@ -44,6 +49,7 @@ public class PlayerController : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         cc = GetComponent<CharacterController>();
+        Anim = GetComponent<PlayerAnimator>();
 
         currentStats = baseStats;
         aimDir = transform.forward;
