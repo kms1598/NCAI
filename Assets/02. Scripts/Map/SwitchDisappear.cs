@@ -4,9 +4,15 @@ public class SwitchDisappear : MonoBehaviour, ISwitchable
 {
     public bool isSpecial;
 
-    public void OnEnable()
+    void OnEnable()
     {
         if(isSpecial && Switch.specialTriggered) gameObject.SetActive(false);
+        Switch.OnTriggered += SetState;
+    }
+
+    void OnDisable()
+    {
+        Switch.OnTriggered -= SetState;
     }
 
     public void SetState()
