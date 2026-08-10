@@ -8,10 +8,16 @@ public class PlayerInteractor : MonoBehaviour
 
     public void OnInteract(InputValue v)
     {
-        if (v.isPressed && current != null)
+        if (v.isPressed)
         {
+            if(DescriptionUI.instance.IsOpen)
+            {
+                DescriptionUI.instance.Close();
+                return;
+            }
+
             if (interactUI != null) interactUI.SetActive(false);
-            current.Interact();
+            if (current != null) current.Interact();
         }
     }
 
