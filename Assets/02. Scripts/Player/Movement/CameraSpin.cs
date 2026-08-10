@@ -14,7 +14,9 @@ public class CameraSpin : MonoBehaviour
     public float rotateSmooth = 0.2f;
 
     public Vector3 roomCenter;
-    public bool tallRoom = false;
+
+    private float smoothedY;
+    private bool smoothedYInit;
 
     public float currentYaw;
     private float targetYaw;
@@ -51,14 +53,20 @@ public class CameraSpin : MonoBehaviour
     {
         targetYaw = dirIndex * 90f;
         currentYaw = Mathf.SmoothDampAngle(currentYaw, targetYaw, ref yawVel, rotateSmooth);
+        
+        if(PlayerController.instance.cc.isGrounded)
+        {
+            lastGroundY = PlayerController.instance.transform.position.y;
+        }
+        if (!smoothedYInit)
+        {
+            smoothedY = lastGroundY;
+            smoothedYInit = true;
+        }
+        smoothedY = Mathf.SmoothDamp(smoothedY, lastGroundY, ref camYVel, 0.3f);
 
         Vector3 pivot = roomCenter;
-        if(tallRoom && PlayerController.instance != null)
-        {
-            if (PlayerController.instance.cc != null && PlayerController.instance.cc.isGrounded) lastGroundY = PlayerController.instance.transform.position.y;
-            pivot.y = Mathf.SmoothDamp(pivot.y, lastGroundY, ref camYVel, 0.3f);
-        }
-        pivot.y += heightOffset;
+        pivot.y = smoothedY + heightOffset;
 
         Quaternion rot = Quaternion.Euler(pitch, currentYaw, 0);
         Vector3 offset = rot * new Vector3(0, 0, -distance);
@@ -69,8 +77,11 @@ public class CameraSpin : MonoBehaviour
     public void SetRoom(Vector3 center, bool isTall)
     {
         roomCenter = center;
-        tallRoom = isTall;
-        if (PlayerController.instance != null) lastGroundY = PlayerController.instance.transform.position.y;
+        if (PlayerController.instance != null)
+        {
+            lastGroundY = PlayerController.instance.transform.position.y;
+            smoothedY = lastGroundY;
+        }
     }
 
     public void OnRotateLeft(InputValue v)

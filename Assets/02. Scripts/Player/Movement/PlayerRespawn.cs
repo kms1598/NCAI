@@ -1,8 +1,11 @@
+using System;
 using UnityEngine;
 
 public class PlayerRespawn : MonoBehaviour
 {
     private Vector3 currentSpawnPos;
+
+    public static event Action OnRespawn;
 
     void Awake()
     {
@@ -22,5 +25,7 @@ public class PlayerRespawn : MonoBehaviour
         PlayerController.instance.ResetVelocity();
         // Anim: Respawn — 리스폰
         PlayerController.instance.Anim?.PlayRespawn();
+
+        OnRespawn?.Invoke();
     }
 }
