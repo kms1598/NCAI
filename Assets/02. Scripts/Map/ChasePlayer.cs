@@ -1,14 +1,29 @@
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class ChasePlayer : MonoBehaviour
 {
+    Vector3 startPos;
+    Quaternion startRot;
     public Transform player;
     public float speed = 5f;
     public float chaseRange = 3f;
-    public float yTolerance = 0.001f;
+    public float yTolerance = 1.5f;
+
+    void OnEnable()
+    {
+        PlayerRespawn.OnRespawn += ResetSelf;
+        ResetSelf();
+    }
+    void OnDisable()
+    {
+        PlayerRespawn.OnRespawn -= ResetSelf;
+    }
 
     void Start()
     {
+        startPos = transform.position;
+        startRot = transform.rotation;
         player = PlayerController.instance.gameObject.transform;
     }
 
@@ -30,5 +45,11 @@ public class ChasePlayer : MonoBehaviour
         Vector3 dir = flat.normalized;
         transform.position += dir * speed * Time.deltaTime;
         transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
+    }
+
+    private void ResetSelf()
+    {
+        transform.position = startPos;
+        transform.rotation = startRot;
     }
 }
