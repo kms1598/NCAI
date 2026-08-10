@@ -11,7 +11,7 @@ public abstract class PlayerState
 
     protected void ApplyHorizontalMove()
     {
-        Vector3 move = pc.GetCameraRelativeMove() * pc.Stats.moveSpeed;
+        Vector3 move = pc.GetDirectionalMove() * pc.Stats.moveSpeed;
         pc.velocity.x = move.x;
         pc.velocity.z = move.z;
     }

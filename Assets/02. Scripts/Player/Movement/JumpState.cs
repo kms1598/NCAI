@@ -20,6 +20,8 @@ public class JumpState : PlayerState
 
         if(pc.cc.isGrounded && pc.velocity.y <= 0f)
         {
+            // Anim: Land — 착지 후 Idle/Move
+            pc.Anim?.PlayLand();
             pc.TransitionTo(pc.Ground);
         }
     }

@@ -55,5 +55,7 @@ public class CrawlAbility : IAbility
             pc.cc.center = new Vector3(0, 1f, 0);
             pc.gameObject.layer = LayerMask.NameToLayer("Player");
         }
+        // Anim: Crawl_Idle / Crawl_Move — 기어가기 on·off
+        pc.Anim?.SetCrawling(on);
     }
 }

@@ -44,7 +44,26 @@ public class AbilityManager : MonoBehaviour
 
         selectedIndex = 0;
         currentIndex = 0;
-        slots[currentIndex].OnEquip(PlayerController.instance);
+    }
+
+    void Start()
+    {
+        // 중복 인스턴스는 Awake에서 파괴 예약만 되고 Start가 불릴 수 있으므로 한 번 더 걸러 냅니다.
+        if (instance != this) return;
+
+        // PlayerController.instance는 PlayerController.Awake에서 채워지고
+        // Awake끼리는 실행 순서가 보장되지 않으므로 초기 장착은 Start에서 처리합니다.
+        PlayerController pc = PlayerController.instance;
+
+        if (pc == null)
+        {
+            Debug.LogWarning($"{name}: 씬에 PlayerController가 없어 초기 능력 장착을 건너뜁니다.", this);
+            return;
+        }
+
+        slots[currentIndex].OnEquip(pc);
+        // Anim: AbilityIndex — 초기 형태(None)
+        pc.Anim?.SetAbilityIndex(currentIndex);
     }
 
     void Update()
@@ -66,6 +85,10 @@ public class AbilityManager : MonoBehaviour
     public void GetItem(int index)
     {
         if (index < 0 || slots.Length <= index) return;
+        if (items[index] == 0)
+        {
+            UILoadingPanel.instance.Close();
+        }
         items[index]++;
         OnGetItem?.Invoke(index, items[index]);
 
@@ -109,6 +132,8 @@ public class AbilityManager : MonoBehaviour
         currentIndex = selectedIndex;
         slots[currentIndex].OnEquip(PlayerController.instance);
         RecalStats();
+        // Anim: Transform + AbilityIndex — 능력 형태 전환
+        PlayerController.instance.Anim?.PlayTransform(currentIndex);
         OnTransformed?.Invoke(currentIndex);
     }
 
