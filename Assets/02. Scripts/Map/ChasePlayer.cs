@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using UnityEngine;
 
 public class ChasePlayer : MonoBehaviour
@@ -9,11 +8,12 @@ public class ChasePlayer : MonoBehaviour
     public float speed = 5f;
     public float chaseRange = 3f;
     public float yTolerance = 1.5f;
+    bool isInit = false;
 
     void OnEnable()
     {
         PlayerRespawn.OnRespawn += ResetSelf;
-        ResetSelf();
+        if (isInit) ResetSelf();
     }
     void OnDisable()
     {
@@ -22,9 +22,10 @@ public class ChasePlayer : MonoBehaviour
 
     void Start()
     {
-        startPos = transform.position;
-        startRot = transform.rotation;
+        startPos = transform.localPosition;
+        startRot = transform.localRotation;
         player = PlayerController.instance.gameObject.transform;
+        isInit = true;
     }
 
     void Update()
@@ -49,7 +50,7 @@ public class ChasePlayer : MonoBehaviour
 
     private void ResetSelf()
     {
-        transform.position = startPos;
-        transform.rotation = startRot;
+        transform.localPosition = startPos;
+        transform.localRotation = startRot;
     }
 }

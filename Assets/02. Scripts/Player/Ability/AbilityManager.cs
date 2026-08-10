@@ -11,6 +11,7 @@ public class AbilityManager : MonoBehaviour
     bool[] unlocked;
     int selectedIndex;
     int currentIndex;
+    public int CurrentIndex => currentIndex;
     const int SUBLIMATION_INDEX = 4;
 
     public Action<int> OnSelectionChanged;

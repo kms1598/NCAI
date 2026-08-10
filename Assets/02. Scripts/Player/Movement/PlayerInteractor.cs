@@ -8,7 +8,11 @@ public class PlayerInteractor : MonoBehaviour
 
     public void OnInteract(InputValue v)
     {
-        if (v.isPressed && current != null) current.Interact();
+        if (v.isPressed && current != null)
+        {
+            if (interactUI != null) interactUI.SetActive(false);
+            current.Interact();
+        }
     }
 
     void OnTriggerEnter(Collider other)
