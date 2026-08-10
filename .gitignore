@@ -108,3 +108,5 @@ InitTestScene*.unity*
 # 에디터가 크래시 복구용으로 쌓는 씬 사본
 /[Aa]ssets/_Recovery/
 /[Aa]ssets/_Recovery.meta
+Assets/TextMesh Pro/Fonts/NEXON_Warhaven_Regular 1 SDF.asset
+Assets/TextMesh Pro/Fonts/NEXON_Warhaven_Regular 1 SDF.asset.meta

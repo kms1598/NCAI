@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Switch : MonoBehaviour, IArrowHittable, IInteractable
@@ -5,13 +6,18 @@ public class Switch : MonoBehaviour, IArrowHittable, IInteractable
     public MonoBehaviour[] targets;
     public bool isSpecialSwitch = false;
     public static bool specialTriggered = false;
+    public static event Action OnTriggered;
 
     public void OnArrowHit() => Activate();
     public void Interact() => Activate();
 
     void Activate()
     {
-        if (isSpecialSwitch) specialTriggered = true;
+        if (isSpecialSwitch)
+        {
+            OnTriggered?.Invoke();
+            specialTriggered = true;
+        }
 
         foreach(var t in targets)
         {
