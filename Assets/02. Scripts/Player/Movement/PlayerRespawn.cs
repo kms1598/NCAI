@@ -1,8 +1,11 @@
+using System;
 using UnityEngine;
 
 public class PlayerRespawn : MonoBehaviour
 {
     private Vector3 currentSpawnPos;
+
+    public static event Action OnRespawn;
 
     void Awake()
     {
@@ -20,5 +23,7 @@ public class PlayerRespawn : MonoBehaviour
         transform.position = currentSpawnPos;
         PlayerController.instance.cc.enabled = true;
         PlayerController.instance.ResetVelocity();
+
+        OnRespawn?.Invoke();
     }
 }
