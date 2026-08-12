@@ -22723,7 +22723,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 99be09444d5df0e45a08eb468318eba9, type: 2}
   - {fileID: 11400000, guid: 82a214964d1e63e4f87b69594da67020, type: 2}
   - {fileID: 11400000, guid: 8551851b1fab85e47b9b8249d568d1b0, type: 2}
-  stageNumberText: {fileID: 1228448382}
+  stageNumberText: {fileID: 1578956170}
   stageNameText: {fileID: 1228448382}
   canvasGroup: {fileID: 1797854983}
   panelFadeDuration: 0.5
