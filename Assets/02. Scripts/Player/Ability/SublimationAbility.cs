@@ -31,7 +31,9 @@ public class SublimationAbility : IAbility
     public void OnEquip(PlayerController pc)
     {
         pc.gameObject.layer = LayerMask.NameToLayer("Sublimation");
+        AudioManager.Play(SFXKey.SublimationBallet);
     }
+
     public void Fire(PlayerController pc) { }
 
     public void OnUnequip(PlayerController pc)

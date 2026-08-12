@@ -37,6 +37,7 @@ public class ArrowAbility : IAbility
         if (rb) rb.linearVelocity = dir * 10f;
         // Anim: Shoot — 화살 발사
         pc.Anim?.PlayShoot();
+        AudioManager.Play(SFXKey.Bow);
     }
 
     public void OnUnequip(PlayerController pc) { }
