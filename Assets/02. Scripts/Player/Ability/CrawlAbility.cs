@@ -33,6 +33,9 @@ public class CrawlAbility : IAbility
     public void Fire(PlayerController pc)
     {
         SetActive(pc, !active);
+        // 소리는 SetActive가 아니라 여기서 냅니다. 형태 전환으로 해제될 때는
+        // AbilityManager가 이미 전환음을 내므로 소리가 겹치면 안 됩니다.
+        AudioManager.Play(SFXKey.CharacterChange);
     }
 
     public void OnUnequip(PlayerController pc)
@@ -57,5 +60,8 @@ public class CrawlAbility : IAbility
         }
         // Anim: Crawl_Idle / Crawl_Move — 기어가기 on·off
         pc.Anim?.SetCrawling(on);
+
+        // 기어갈 때는 두 발로 걷는 소리가 어울리지 않아 발소리를 끕니다.
+        if (pc.Footstep != null) pc.Footstep.Muted = on;
     }
 }

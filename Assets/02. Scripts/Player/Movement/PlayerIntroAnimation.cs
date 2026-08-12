@@ -70,5 +70,9 @@ public class PlayerIntroAnimation : MonoBehaviour
 
         finished = true;
         pc.SetControlEnabled(true);
+
+        // Stand Up이 끝난 직후 스테이지 0 시작 연출을 띄웁니다.
+        if (StagePanel.instance != null)
+            StagePanel.instance.StartStageStartAnimation(0);
     }
 }

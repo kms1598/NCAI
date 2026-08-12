@@ -13,6 +13,9 @@ public class Switch : MonoBehaviour, IArrowHittable, IInteractable
 
     void Activate()
     {
+        // AudioManager가 소리를 대신 내 주므로, 바로 아래에서 이 오브젝트를 꺼도 소리는 끝까지 재생됩니다.
+        AudioManager.PlayAt(SFXKey.Switch, transform.position);
+
         if (isSpecialSwitch)
         {
             OnTriggered?.Invoke();
