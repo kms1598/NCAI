@@ -29,7 +29,9 @@ public class ArrowAbility : IAbility
         dir.y = 0;
         dir.Normalize();
 
-        var arrow = Object.Instantiate(pc.arrowPrefab, pc.transform.position + dir, Quaternion.LookRotation(dir));
+        Quaternion rot = Quaternion.LookRotation(dir) * Quaternion.Euler(0, -90, 0);
+
+        var arrow = Object.Instantiate(pc.arrowPrefab, pc.transform.position + dir, rot);
         arrow.GetComponent<Transform>().position += Vector3.up;
         var rb = arrow.GetComponent<Rigidbody>();
         if (rb) rb.linearVelocity = dir * 10f;
