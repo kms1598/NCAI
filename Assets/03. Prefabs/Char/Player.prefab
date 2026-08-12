@@ -270,6 +270,9 @@ MonoBehaviour:
   playerJoint: {fileID: 4218221399406876322}
   stringHeight: 10
   followSpeed: 3
+  rotationReference: {fileID: 0}
+  followRotation: 1
+  maxFollowLag: 1.5
   curveResolution: 27
   sagAmount: 1.5
   sagDirection: {x: 1, y: 0, z: 0}
@@ -532,6 +535,9 @@ MonoBehaviour:
   playerJoint: {fileID: 261940730393399049}
   stringHeight: 10
   followSpeed: 3
+  rotationReference: {fileID: 0}
+  followRotation: 1
+  maxFollowLag: 1.5
   curveResolution: 27
   sagAmount: 3
   sagDirection: {x: 1, y: 1, z: 1}
@@ -693,6 +699,9 @@ MonoBehaviour:
   playerJoint: {fileID: 103720644208092752}
   stringHeight: 10
   followSpeed: 3
+  rotationReference: {fileID: 0}
+  followRotation: 1
+  maxFollowLag: 1.5
   curveResolution: 27
   sagAmount: 3
   sagDirection: {x: 2, y: 0, z: 1}
@@ -1012,6 +1021,9 @@ MonoBehaviour:
   playerJoint: {fileID: 1863549686538706390}
   stringHeight: 10
   followSpeed: 3
+  rotationReference: {fileID: 0}
+  followRotation: 1
+  maxFollowLag: 1.5
   curveResolution: 27
   sagAmount: 3
   sagDirection: {x: -1, y: -1, z: -1}
@@ -1554,6 +1566,9 @@ MonoBehaviour:
   playerJoint: {fileID: 8272889950862879538}
   stringHeight: 10
   followSpeed: 3
+  rotationReference: {fileID: 0}
+  followRotation: 1
+  maxFollowLag: 1.5
   curveResolution: 27
   sagAmount: 3
   sagDirection: {x: -2, y: 0, z: -1}
@@ -1625,7 +1640,6 @@ Transform:
   - {fileID: 4312162795560604800}
   - {fileID: 1115296360920817542}
   - {fileID: 6276883245965525378}
-  - {fileID: 5998041023375811485}
   m_Father: {fileID: 7131788067294826903}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5058194152862575981
@@ -1689,11 +1703,11 @@ Transform:
   m_GameObject: {fileID: 5144399662086009091}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.039445188, y: -0.0012386036, z: 0.011002693}
-  m_LocalScale: {x: 0.02, y: 0.001, z: 0.02}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 0.05, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1198471631176369052}
+  m_Father: {fileID: 7131788067294826903}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4733167229181225243
 MeshFilter:
@@ -1958,6 +1972,9 @@ MonoBehaviour:
   playerJoint: {fileID: 5604706441981733545}
   stringHeight: 10
   followSpeed: 3
+  rotationReference: {fileID: 0}
+  followRotation: 1
+  maxFollowLag: 1.5
   curveResolution: 27
   sagAmount: 1.5
   sagDirection: {x: -1, y: 0, z: 0}
@@ -2409,6 +2426,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 5998041023375811485}
   - {fileID: 1198471631176369052}
   - {fileID: 6237407553660270216}
   m_Father: {fileID: 0}

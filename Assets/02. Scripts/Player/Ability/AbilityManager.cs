@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using UnityEditor.Search;
 using UnityEngine;
 
 public class AbilityManager : MonoBehaviour
@@ -8,13 +9,15 @@ public class AbilityManager : MonoBehaviour
 
     IAbility[] slots;
     int[] items;
+    public int[] Items => items; 
     int[] maxItems = { 0, 4, 4, 3, 0 };
     bool[] unlocked;
     int selectedIndex;
     int currentIndex;
     public int CurrentIndex => currentIndex;
     const int SUBLIMATION_INDEX = 4;
-
+    bool hasFocus = false;
+        
     /// <summary>승화 형태로 변신해 있는지입니다.</summary>
     public bool IsSublimation => currentIndex == SUBLIMATION_INDEX;
 
@@ -148,17 +151,26 @@ public class AbilityManager : MonoBehaviour
         if (index < 0 || slots.Length <= index) return;
         if (!unlocked[index]) return;
         selectedIndex = index;
+        hasFocus = true;
         AudioManager.Play(SFXKey.CharacterSelect);
         OnSelectionChanged?.Invoke(selectedIndex);
     }
 
     public void Transform()
     {
-        if (selectedIndex == currentIndex) return;
-        if (!unlocked[selectedIndex]) return;
+        int target = hasFocus ? selectedIndex : 0;
+
+        if (target == currentIndex)
+        {
+            hasFocus = false;
+            SelectSlot(0);
+            return;
+        }
+        if (0 < target && !unlocked[selectedIndex]) return;
 
         slots[currentIndex].OnUnequip(PlayerController.instance);
-        currentIndex = selectedIndex;
+        currentIndex = target;
+        hasFocus = false;
         slots[currentIndex].OnEquip(PlayerController.instance);
         RecalStats();
         // Anim: Transform + AbilityIndex — 능력 형태 전환
