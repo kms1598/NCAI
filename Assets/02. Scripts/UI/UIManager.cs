@@ -52,12 +52,12 @@ public class UIManager : MonoBehaviour
     {
         foreach(var f in abilityFocus) f.SetActive(false);
 
-        abilityFocus[index - 1].SetActive(true);
+        if(index != 0) abilityFocus[index - 1].SetActive(true);
     }
 
     void Transform(int index)
     {
-        abilityIcon.sprite = abilitySprite[index - 1];
+        abilityIcon.sprite = abilitySprite[index];
         foreach (var f in abilityFocus) f.SetActive(false);
     }
 }
