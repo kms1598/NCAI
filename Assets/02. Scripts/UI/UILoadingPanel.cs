@@ -22,6 +22,8 @@ public class UILoadingPanel : MonoBehaviour
     [SerializeField] float fadeDuration = 0.3f;
     [Tooltip("Close()를 인자 없이 불렀을 때 닫힌 상태를 유지할 시간(초)입니다.")]
     [SerializeField] float defaultHoldDuration = 1f;
+    [Tooltip("씬이 바뀌어도 패널을 유지합니다. 씬 전환 연출에 쓰려면 켜 두세요.")]
+    [SerializeField] bool persistAcrossScenes = true;
 
     Coroutine running;
     Tween fadeTween;
@@ -42,37 +44,95 @@ public class UILoadingPanel : MonoBehaviour
 
         // 일시정지(timeScale 0) 중에도 연출이 돌아가야 합니다.
         if (animator != null) animator.updateMode = AnimatorUpdateMode.UnscaledTime;
+
+        if (persistAcrossScenes) KeepAlive();
     }
 
-    /// <summary>Open 애니메이션을 재생하고 끝나면 페이드 아웃으로 화면을 보여 줍니다.</summary>
-    public void Open()
+    void OnDestroy()
     {
-        Restart(OpenRoutine());
+        // 비워 두지 않으면 씬과 함께 사라진 뒤에도 instance가 파괴된 오브젝트를 가리킵니다.
+        // 그 상태로 Close()를 부르면 MissingReferenceException이 납니다.
+        if (instance == this) instance = null;
+    }
+
+    /// <summary>
+    /// 씬이 바뀌어도 살아남게 합니다.
+    /// 이게 없으면 씬을 덮은 채로 전환하다가 패널이 이전 씬과 함께 사라져 화면이 번쩍입니다.
+    /// </summary>
+    void KeepAlive()
+    {
+        // DontDestroyOnLoad는 루트 오브젝트에만 걸립니다.
+        // 다른 UI가 붙은 Canvas의 자식으로 두면 그 UI까지 따라와 다음 씬에서 겹칩니다.
+        if (transform.parent != null)
+        {
+            Debug.LogWarning($"{name}: 씬 전환 중에도 남으려면 이 패널이 루트 오브젝트여야 합니다. " +
+                             "다른 UI와 분리된 별도 Canvas로 만들어 주세요.", this);
+            return;
+        }
+
+        DontDestroyOnLoad(gameObject);
+        // Screen Space - Camera로 두면 이전 씬 카메라가 사라지는 순간 캔버스가 안 그려집니다.
+        // Overlay로 바꿔야 씬이 바뀐 뒤 Open 연출이 보입니다.
+        EnsureOverlayCanvas();
+    }
+
+    /// <summary>
+    /// 씬 전환 후에도 항상 최상단에 그려지도록 Canvas를 Overlay로 맞춥니다.
+    /// </summary>
+    void EnsureOverlayCanvas()
+    {
+        Canvas canvas = GetComponent<Canvas>();
+        if (canvas == null) canvas = GetComponentInParent<Canvas>();
+        if (canvas == null) return;
+
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        // 다른 UI보다 위에 덮여야 로딩 연출이 가려지지 않습니다.
+        if (canvas.sortingOrder < 1000) canvas.sortingOrder = 1000;
+
+        // 에디터에서 Scale이 (0,0,0)으로 저장된 경우가 있어, 그대로면 알파와 무관하게 안 보입니다.
+        if (canvas.transform.localScale == Vector3.zero)
+            canvas.transform.localScale = Vector3.one;
+    }
+
+    /// <summary>
+    /// Open 애니메이션을 재생하고 끝나면 페이드 아웃으로 화면을 보여 줍니다.
+    /// 반환한 Coroutine을 yield return하면 연출이 끝날 때까지 기다릴 수 있습니다.
+    /// </summary>
+    public Coroutine Open()
+    {
+        return Restart(OpenRoutine());
     }
 
     /// <summary>닫은 뒤 defaultHoldDuration만큼 기다렸다가 다시 엽니다.</summary>
-    public void Close()
+    public Coroutine Close()
     {
-        Close(defaultHoldDuration);
+        return Close(defaultHoldDuration);
     }
 
     /// <summary>
     /// 페이드 인 → Close 애니메이션 → holdDuration만큼 대기 → Open 순서로 진행합니다.
     /// </summary>
-    public void Close(float holdDuration)
+    public Coroutine Close(float holdDuration)
     {
-        Restart(CloseRoutine(holdDuration));
+        return Restart(CloseRoutine(holdDuration));
     }
 
-    /// <summary>닫은 상태로 유지합니다. 여는 시점을 직접 정하고 싶을 때 쓰세요.</summary>
-    public void CloseAndHold()
+    /// <summary>
+    /// 닫은 상태로 유지합니다. 여는 시점을 직접 정하고 싶을 때 쓰세요.
+    /// 씬 전환처럼 화면을 덮은 동안 다른 일을 해야 할 때 이걸 씁니다.
+    /// </summary>
+    public Coroutine CloseAndHold()
     {
-        Restart(CloseRoutine(-1f));
+        return Restart(CloseRoutine(-1f));
     }
 
     IEnumerator OpenRoutine()
     {
         SetBlocking(true);
+
+        // CloseAndHold 직후면 알파가 1이어야 합니다.
+        // 씬 교체로 패널이 바뀌었거나 시작 알파가 0이면 Open 애니가 안 보이므로 먼저 덮습니다.
+        if (canvasGroup.alpha < 1f) canvasGroup.alpha = 1f;
 
         yield return PlayState(openStateName);
         yield return Fade(0f);
@@ -122,11 +182,22 @@ public class UILoadingPanel : MonoBehaviour
         canvasGroup.interactable = on;
     }
 
-    void Restart(IEnumerator routine)
+    Coroutine Restart(IEnumerator routine)
     {
+        // 꺼진 오브젝트에서는 코루틴을 시작할 수 없습니다.
+        // 여기서 걸러 내지 않으면 씬 전환을 기다리던 쪽이 예외를 맞습니다.
+        if (!gameObject.activeInHierarchy)
+        {
+            Debug.LogWarning($"{name}: 패널이 비활성 상태라 연출을 재생할 수 없습니다. " +
+                             "오브젝트는 켜 두고 CanvasGroup의 Alpha를 0으로 숨기세요.", this);
+            return null;
+        }
+
         if (running != null) StopCoroutine(running);
         fadeTween?.Kill();
 
         running = StartCoroutine(routine);
+
+        return running;
     }
 }

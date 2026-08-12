@@ -14,6 +14,7 @@ public class SwitchDoor : MonoBehaviour, ISwitchable
         isOpen = true;
         closedDoor.SetActive(false);
         openDoor.SetActive(true);
+        AudioManager.PlayAt(SFXKey.OpenDoor, transform.position);
     }
 
 
@@ -22,6 +23,7 @@ public class SwitchDoor : MonoBehaviour, ISwitchable
         if (!other.CompareTag("Player")) return;
         if (!isOpen) return;
 
+        AudioManager.Play(SFXKey.EnterDoor);
         other.GetComponent<PlayerRespawn>()?.SetSpawn(targetSpawn.position);
 
         RoomManager.instance.SwitchRoom(targetRoomId, targetSpawn.position);

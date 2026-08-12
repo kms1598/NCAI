@@ -26,6 +26,7 @@ public class GroundState : PlayerState
             pc.velocity.y = MathF.Sqrt(2f * -pc.gravity * pc.Stats.jumpHeight);
             // Anim: Jump — 점프 시작
             pc.Anim?.PlayJump();
+            AudioManager.Play(SFXKey.Jump);
             pc.TransitionTo(pc.Jump);
             return;
         }

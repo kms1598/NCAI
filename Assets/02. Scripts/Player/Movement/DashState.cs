@@ -22,6 +22,10 @@ public class DashState : PlayerState
         PlayerController.instance.MarkDashUsedTime();
         // Anim: Dash — 대시 연출
         pc.Anim?.PlayDash();
+
+        // 승화 형태의 대시만 공격으로 취급해 전용 소리를 냅니다. 다른 형태의 대시는 조용합니다.
+        if (AbilityManager.instance != null && AbilityManager.instance.IsSublimation)
+            AudioManager.Play(SFXKey.SublimationAttack);
     }
 
     public override void Update()

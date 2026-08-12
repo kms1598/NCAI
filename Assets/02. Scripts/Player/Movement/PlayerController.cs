@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
 
     public CharacterController cc;
     public PlayerAnimator Anim { get; private set; }
+    public PlayerFootstep Footstep { get; private set; }
 
     /// <summary>false면 이동·점프·대시·조준이 모두 멈춥니다. 인트로 연출 등에 사용.</summary>
     public bool CanControl { get; private set; } = true;
@@ -63,6 +64,11 @@ public class PlayerController : MonoBehaviour
 
         cc = GetComponent<CharacterController>();
         Anim = GetComponent<PlayerAnimator>();
+
+        // 발소리는 별도 설정 없이도 동작해야 하므로, 컴포넌트를 안 붙여 뒀으면 여기서 붙입니다.
+        // 걸음 간격이나 음량을 직접 조절하려면 인스펙터에서 PlayerFootstep을 추가하세요.
+        Footstep = GetComponent<PlayerFootstep>();
+        if (Footstep == null) Footstep = gameObject.AddComponent<PlayerFootstep>();
 
         currentStats = baseStats;
         aimDir = transform.forward;
