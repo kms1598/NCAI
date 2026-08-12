@@ -9,6 +9,7 @@ public class Door : MonoBehaviour
     {
         if(!other.CompareTag("Player")) return;
 
+        AudioManager.Play(SFXKey.EnterDoor);
         other.GetComponent<PlayerRespawn>()?.SetSpawn(targetSpawn.position);
 
         RoomManager.instance.SwitchRoom(targetRoomId, targetSpawn.position);

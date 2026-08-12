@@ -19,6 +19,8 @@ public class PlayerRespawn : MonoBehaviour
 
     public void Respawn()
     {
+        AudioManager.Play(SFXKey.PlayerDie);
+
         PlayerController.instance.cc.enabled = false;
         transform.position = currentSpawnPos;
         PlayerController.instance.cc.enabled = true;

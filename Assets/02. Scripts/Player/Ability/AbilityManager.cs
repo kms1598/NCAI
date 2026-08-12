@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class AbilityManager : MonoBehaviour
@@ -13,6 +14,9 @@ public class AbilityManager : MonoBehaviour
     int currentIndex;
     public int CurrentIndex => currentIndex;
     const int SUBLIMATION_INDEX = 4;
+
+    /// <summary>승화 형태로 변신해 있는지입니다.</summary>
+    public bool IsSublimation => currentIndex == SUBLIMATION_INDEX;
 
     public Action<int> OnSelectionChanged;
     public Action<int> OnTransformed;
@@ -86,24 +90,47 @@ public class AbilityManager : MonoBehaviour
     public void GetItem(int index)
     {
         if (index < 0 || slots.Length <= index) return;
+
+        // 정해진 개수를 넘겨 모으면 UI에 표시할 조각 칸이 없어 받는 쪽에서 범위를 벗어납니다.
+        if (maxItems[index] <= items[index]) return;
+
+        // 능력별 첫 조각: 로딩 패널로 화면을 덮었다가 연 뒤, 스테이지 연출을 이어 붙입니다.
+        // ?. 대신 != null로 비교해야 합니다. ?.는 C# 참조만 보기 때문에
+        // 파괴된 패널을 가리키고 있어도 통과시켜 버립니다.
         if (items[index] == 0)
-        {
-            UILoadingPanel.instance.Close();
-        }
+            StartCoroutine(PlayFirstItemReveal(index));
+
+        
         items[index]++;
+        AudioManager.Play(SFXKey.Piece);
         OnGetItem?.Invoke(index, items[index]);
 
         if(TryGetSublimation())
         {
             unlocked[SUBLIMATION_INDEX] = true;
             items[SUBLIMATION_INDEX]++;
+            AudioManager.Play(SFXKey.CharacterOn);
             OnGetItem?.Invoke(SUBLIMATION_INDEX, items[SUBLIMATION_INDEX]);
             OnUnlocked?.Invoke(SUBLIMATION_INDEX);
         }
 
         if (unlocked[index]) return;
         unlocked[index] = true;
+        AudioManager.Play(SFXKey.CharacterOn);
         OnUnlocked?.Invoke(index);
+    }
+
+    /// <summary>
+    /// UILoadingPanel Close → Open이 끝난 다음에 StagePanel 연출을 켭니다.
+    /// Close() 안에 Open까지 들어 있어서, 그 코루틴이 끝날 때까지 기다리면 됩니다.
+    /// </summary>
+    IEnumerator PlayFirstItemReveal(int stageIndex)
+    {
+        if (UILoadingPanel.instance != null)
+            yield return UILoadingPanel.instance.Close();
+
+        if (StagePanel.instance != null)
+            StagePanel.instance.StartStageStartAnimation(stageIndex);
     }
 
     bool TryGetSublimation()
@@ -121,6 +148,7 @@ public class AbilityManager : MonoBehaviour
         if (index < 0 || slots.Length <= index) return;
         if (!unlocked[index]) return;
         selectedIndex = index;
+        AudioManager.Play(SFXKey.CharacterSelect);
         OnSelectionChanged?.Invoke(selectedIndex);
     }
 
@@ -135,6 +163,7 @@ public class AbilityManager : MonoBehaviour
         RecalStats();
         // Anim: Transform + AbilityIndex — 능력 형태 전환
         PlayerController.instance.Anim?.PlayTransform(currentIndex);
+        AudioManager.Play(SFXKey.CharacterChange);
         OnTransformed?.Invoke(currentIndex);
     }
 

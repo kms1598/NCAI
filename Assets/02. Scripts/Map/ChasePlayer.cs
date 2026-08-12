@@ -8,7 +8,15 @@ public class ChasePlayer : MonoBehaviour
     public float speed = 5f;
     public float chaseRange = 3f;
     public float yTolerance = 1.5f;
+
+    [Tooltip("추격을 시작할 때 낼 소리입니다. 적 종류에 따라 sfx_enemy_1~3 중에서 고르세요.")]
+    [SerializeField] string chaseSfx = SFXKey.Enemy1;
+    [Tooltip("추격 범위 경계에서 소리가 겹치지 않도록 두는 최소 간격(초)입니다.")]
+    [SerializeField] float chaseSfxCooldown = 4f;
+
     bool isInit = false;
+    bool chasing = false;
+    float lastChaseSfxTime = -999f;
 
     void OnEnable()
     {
@@ -30,27 +38,45 @@ public class ChasePlayer : MonoBehaviour
 
     void Update()
     {
-        if (player == null) return;
+        bool canChase = TryGetChaseDirection(out Vector3 dir);
 
-        bool grounded = PlayerController.instance.cc.isGrounded;
+        // 추격이 시작되는 순간에만 한 번 울립니다. 상태를 기억하지 않으면 매 프레임 소리가 겹칩니다.
+        if (canChase && !chasing && lastChaseSfxTime + chaseSfxCooldown <= Time.time)
+        {
+            AudioManager.PlayAt(chaseSfx, transform.position);
+            lastChaseSfxTime = Time.time;
+        }
 
-        if (!grounded) return;
+        chasing = canChase;
 
-        if (yTolerance < Mathf.Abs(player.position.y - transform.position.y)) return;
+        if (!canChase) return;
+
+        transform.position += dir * speed * Time.deltaTime;
+        transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
+    }
+
+    bool TryGetChaseDirection(out Vector3 dir)
+    {
+        dir = Vector3.zero;
+
+        if (player == null || PlayerController.instance == null) return false;
+        if (!PlayerController.instance.cc.isGrounded) return false;
+        if (yTolerance < Mathf.Abs(player.position.y - transform.position.y)) return false;
 
         Vector3 flat = player.position - transform.position;
         flat.y = 0;
-        if (chaseRange < flat.magnitude) return;
-        if (flat.sqrMagnitude < 0.0001f) return;
 
-        Vector3 dir = flat.normalized;
-        transform.position += dir * speed * Time.deltaTime;
-        transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
+        if (chaseRange < flat.magnitude) return false;
+        if (flat.sqrMagnitude < 0.0001f) return false;
+
+        dir = flat.normalized;
+        return true;
     }
 
     private void ResetSelf()
     {
         transform.localPosition = startPos;
         transform.localRotation = startRot;
+        chasing = false;
     }
 }

@@ -28,7 +28,11 @@ public class SublimationAbility : IAbility
 
     public void OnActiveUpdate(PlayerController pc) { }
 
-    public void OnEquip(PlayerController pc) { }
+    public void OnEquip(PlayerController pc)
+    {
+        AudioManager.Play(SFXKey.SublimationBallet);
+    }
+
     public void Fire(PlayerController pc) { }
 
     public void OnUnequip(PlayerController pc) { }
