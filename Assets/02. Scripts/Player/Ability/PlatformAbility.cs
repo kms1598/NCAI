@@ -18,12 +18,12 @@ public class PlatformAbility : IAbility
     {
         return new MovementStats
         {
-            moveSpeed = 6f,
+            moveSpeed = 3 * 0.9f,
             jumpHeight = 0f,
-            dashSpeed = 10f,
-            dashDuration = 0.1f,
+            dashSpeed = 0f,
+            dashDuration = 0f,
             canJump = false,
-            canDash = true
+            canDash = false
         };
     }
 

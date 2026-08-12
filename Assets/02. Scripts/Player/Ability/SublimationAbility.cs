@@ -17,9 +17,9 @@ public class SublimationAbility : IAbility
     {
         return new MovementStats
         {
-            moveSpeed = 9f,
-            jumpHeight = 2f,
-            dashSpeed = 30f,
+            moveSpeed = 3f,
+            jumpHeight = 1.5f * 2,
+            dashSpeed = 20f * 1.1f,
             dashDuration = 0.1f,
             canJump = true,
             canDash = true
@@ -28,8 +28,14 @@ public class SublimationAbility : IAbility
 
     public void OnActiveUpdate(PlayerController pc) { }
 
-    public void OnEquip(PlayerController pc) { }
+    public void OnEquip(PlayerController pc)
+    {
+        pc.gameObject.layer = LayerMask.NameToLayer("Sublimation");
+    }
     public void Fire(PlayerController pc) { }
 
-    public void OnUnequip(PlayerController pc) { }
+    public void OnUnequip(PlayerController pc)
+    {
+        pc.gameObject.layer = LayerMask.NameToLayer("Player");
+    }
 }
