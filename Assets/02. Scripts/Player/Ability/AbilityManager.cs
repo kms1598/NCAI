@@ -26,6 +26,11 @@ public class AbilityManager : MonoBehaviour
     public Action<int, int> OnGetItem;
     public Action<int> OnUnlocked;
 
+    /// <summary>능력 사용시 각 모델링을 끄고 켜는 식으로 변신을 구현</summary>
+    [SerializeField] GameObject[] models;
+    [SerializeField] Avatar[] avatars;
+    [SerializeField] Animator animator;
+
     void Awake()
     {
         if (instance == null) instance = this;
@@ -177,6 +182,15 @@ public class AbilityManager : MonoBehaviour
         PlayerController.instance.Anim?.PlayTransform(currentIndex);
         AudioManager.Play(SFXKey.CharacterChange);
         OnTransformed?.Invoke(currentIndex);
+
+        //능력 사용시 변신 로직, 해당 능력과 일치하는 순서로 모델과 아바타를 지정해야 함
+        foreach(var model in models)
+        {
+            model.gameObject.SetActive(false);
+        }
+
+        if (models[currentIndex] != null) models[currentIndex].gameObject.SetActive(true);
+        if (avatars[currentIndex] != null)  animator.avatar = avatars[currentIndex];
     }
 
     public void FireCurrent()
