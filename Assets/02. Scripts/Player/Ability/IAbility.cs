@@ -7,7 +7,6 @@ public interface IAbility
     float GaugeCost { get; }
 
     float DrainPerSecond { get; }
-    bool ProvidesStats { get; }
     bool IsActive { get; }
     MovementStats GetStats();
 

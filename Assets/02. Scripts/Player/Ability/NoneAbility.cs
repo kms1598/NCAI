@@ -8,14 +8,20 @@ public class NoneAbility : IAbility
 
     public float DrainPerSecond => 0f;
 
-    public bool ProvidesStats => false;
-
-    public bool IsActive => false;
+    public bool IsActive => true;
 
 
     public MovementStats GetStats()
     {
-        return default;
+        return new MovementStats
+        {
+            moveSpeed = 3f,
+            jumpHeight = 1.5f,
+            dashSpeed = 20f,
+            dashDuration = 0.2f,
+            canJump = true,
+            canDash = true
+        };
     }
 
     public void OnActiveUpdate(PlayerController pc) { }
