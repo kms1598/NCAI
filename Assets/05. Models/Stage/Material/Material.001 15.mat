@@ -21,10 +21,12 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Material.001 15
-  m_Shader: {fileID: 4800000, guid: 6325d138b58d6ac44b7b4b0b299ad058, type: 3}
+  m_Shader: {fileID: 4800000, guid: 5402b788681635a45aad09e4b77cb71c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _BLEND_ALPHA
+  - _OUTLINEMODE_OUTER
   m_InvalidKeywords:
   - _NORMALMAP
   m_LightmapFlags: 4
@@ -106,6 +108,7 @@ Material:
     m_Floats:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
+    - _AlphaThreshold: 0.5
     - _AlphaToMask: 0
     - _BandSteps: 4
     - _BandingStrength: 0.12
@@ -123,6 +126,8 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
+    - _EdgeSoftness: 0.1
+    - _EmissionStrength: 3
     - _EnvironmentReflections: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
@@ -131,6 +136,9 @@ Material:
     - _Mode: 0
     - _NormalStrength: 0.65
     - _OcclusionStrength: 1
+    - _OutlineMode: 0
+    - _OutlineOnly: 0
+    - _OutlineThickness: 2
     - _PaletteWarmth: 0.25
     - _Parallax: 0.02
     - _QueueOffset: 0
@@ -159,7 +167,9 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
+    - _FillColor: {r: 1, g: 1, b: 1, a: 1}
     - _HighlightTint: {r: 1, g: 1, b: 1, a: 1}
+    - _OutlineColor: {r: 1, g: 0.6, b: 0.2, a: 1}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
