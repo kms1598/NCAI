@@ -6,6 +6,7 @@ public class AbilityDescriptionUI : MonoBehaviour, IPointerEnterHandler, IPointe
 {
     public GameObject panel;
     public TMP_Text text;
+    bool hovering;
 
     [TextArea] public string[] descriptions;
 
@@ -13,9 +14,32 @@ public class AbilityDescriptionUI : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         if (panel != null) panel.SetActive(false);
     }
+    void Start()
+    {
+        if (AbilityManager.instance != null)
+            AbilityManager.instance.OnTransformed += OnTransformed;
+    }
+    void OnDestroy()
+    {
+        if (AbilityManager.instance != null)
+            AbilityManager.instance.OnTransformed -= OnTransformed;
+    }
 
-    public void OnPointerEnter(PointerEventData e) => ShowCurrent();
-    public void OnPointerExit(PointerEventData e) => Hide();
+    void OnTransformed(int index)
+    {
+        if (hovering) ShowCurrent();
+    }
+
+    public void OnPointerEnter(PointerEventData e)
+    {
+        hovering = true;
+        ShowCurrent();
+    }
+    public void OnPointerExit(PointerEventData e)
+    {
+        hovering = false;
+        Hide();
+    }
 
     private void ShowCurrent()
     {

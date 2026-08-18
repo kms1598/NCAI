@@ -8,9 +8,7 @@ public class SublimationAbility : IAbility
 
     public float DrainPerSecond => 0f;
 
-    public bool ProvidesStats => false;
-
-    public bool IsActive => false;
+    public bool IsActive => true;
 
 
     public MovementStats GetStats()
@@ -18,8 +16,8 @@ public class SublimationAbility : IAbility
         return new MovementStats
         {
             moveSpeed = 3f,
-            jumpHeight = 1.5f * 2,
-            dashSpeed = 20f * 1.1f,
+            jumpHeight = 3f,
+            dashSpeed = 22f,
             dashDuration = 0.1f,
             canJump = true,
             canDash = true
