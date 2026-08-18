@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/01. Scenes/PrototypeScene.unity
     guid: 583be47d6da1e29448c574fe4d63bc22
+  - enabled: 1
+    path: Assets/01. Scenes/Stage1CutScene.unity
+    guid: 417584455f52a734cbacdc00b119a921
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

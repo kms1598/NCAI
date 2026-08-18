@@ -17,20 +17,21 @@ public class AbilityManager : MonoBehaviour
     const int SUBLIMATION_INDEX = 4;
     bool hasFocus = false;
 
-    // 컷씬이 끝나고 Prototype 계열 씬으로 돌아온 뒤 재생할 스테이지 연출 번호입니다.
+    // 컷씬 영역에서 돌아온 뒤 재생할 스테이지 연출 번호입니다.
     // -1이면 대기 중인 연출이 없습니다.
     int pendingStageIntro = -1;
 
-    // Prototype 재로드 때 RoomManager가 시작 스폰으로 끌어가지 않도록,
-    // 조각을 먹었던 위치와 방을 기억해 둡니다.
+    // 컷씬으로 떠나기 전 위치·방. ScenenDoor로 돌아올 때 씁니다.
     bool hasReturnPose;
     Vector3 returnPosition;
     string returnRoomId;
 
-    /// <summary>컷씬 복귀용 위치가 저장돼 있는지입니다. RoomManager.Start에서 확인합니다.</summary>
+    /// <summary>컷씬 복귀용 위치가 저장돼 있는지입니다.</summary>
     public bool HasReturnPose => hasReturnPose;
     public Vector3 ReturnPosition => returnPosition;
     public string ReturnRoomId => returnRoomId;
+
+    bool isCutsceneTransition;
         
     /// <summary>승화 형태로 변신해 있는지입니다.</summary>
     public bool IsSublimation => currentIndex == SUBLIMATION_INDEX;
@@ -71,13 +72,10 @@ public class AbilityManager : MonoBehaviour
 
         selectedIndex = 0;
         currentIndex = 0;
-
-        SceneLoader.OnLoadCompleted += OnSceneLoadCompleted;
     }
 
     void OnDestroy()
     {
-        SceneLoader.OnLoadCompleted -= OnSceneLoadCompleted;
         if (instance == this) instance = null;
     }
 
@@ -126,8 +124,8 @@ public class AbilityManager : MonoBehaviour
         // 정해진 개수를 넘겨 모으면 UI에 표시할 조각 칸이 없어 받는 쪽에서 범위를 벗어납니다.
         if (maxItems[index] <= items[index]) return;
 
-        // 능력별 첫 조각: 화면을 덮은 뒤 해당 스테이지 컷씬으로 넘어갑니다.
-        // 컷씬이 끝나고 Prototype 계열 씬으로 돌아오면 StartStageStartAnimation을 재생합니다.
+        // 능력별 첫 조각: 화면을 덮은 뒤 해당 스테이지 컷씬 맵 위치로 텔레포트합니다.
+        // 컷씬 문(ScenenDoor)으로 돌아오면 저장 위치 복귀 + StartStageStartAnimation을 재생합니다.
         if (items[index] == 0)
             StartCoroutine(PlayFirstItemReveal(index));
 
@@ -151,32 +149,40 @@ public class AbilityManager : MonoBehaviour
         OnUnlocked?.Invoke(index);
     }
 
-    /// <summary>stage1CutScene처럼 스테이지 번호로 컷씬 씬 이름을 만듭니다.</summary>
-    public static string GetStageCutsceneName(int stageIndex)
-    {
-        return "stage" + stageIndex + "CutScene";
-    }
-
     /// <summary>
-    /// 로딩 패널로 화면을 덮은 뒤 stage{n}CutScene으로 전환합니다.
-    /// 스테이지 연출은 컷씬이 끝나고 Prototype 씬으로 돌아왔을 때 이어서 재생합니다.
+    /// 로딩 패널로 화면을 덮은 뒤, 스테이지 컷씬 맵 스폰으로 텔레포트합니다.
+    /// 스테이지 연출은 ScenenDoor로 원래 위치에 돌아온 뒤 재생합니다.
     /// </summary>
     IEnumerator PlayFirstItemReveal(int stageIndex)
     {
+        if (isCutsceneTransition) yield break;
+
+        isCutsceneTransition = true;
         pendingStageIntro = stageIndex;
         RememberReturnPose();
 
-        string cutsceneName = GetStageCutsceneName(stageIndex);
-
-        // CloseAndHold로 화면을 덮은 채 유지합니다.
-        // SceneLoader가 컷씬을 불러온 뒤 Open으로 걷어냅니다.
         if (UILoadingPanel.instance != null)
             yield return UILoadingPanel.instance.CloseAndHold();
 
-        SceneLoader.Load(cutsceneName);
+        TeleportToCutscene(stageIndex);
+
+        // 텔레포트 직후 데스존 OnTriggerStay가 한 번 돌 수 있어 전환 플래그를 유지한 채 한 프레임 쉽니다.
+        yield return null;
+
+        if (UILoadingPanel.instance != null)
+            yield return UILoadingPanel.instance.Open();
+
+        // 컷씬 맵에 도착한 뒤 Stage Data의 Timeline을 재생합니다.
+        if (StagePanel.instance != null)
+            StagePanel.instance.PlayStageTimeline(stageIndex);
+
+        isCutsceneTransition = false;
     }
 
-    /// <summary>지금 플레이어 위치와 방을 저장해, Prototype 재진입 때 그대로 되돌립니다.</summary>
+    /// <summary>컷씬 진입/복귀 연출 중입니다. 이 동안 사망 트리거를 무시합니다.</summary>
+    public bool IsCutsceneTransition => isCutsceneTransition;
+
+    /// <summary>지금 플레이어 위치와 방을 저장해, 컷씬에서 돌아올 때 그대로 되돌립니다.</summary>
     void RememberReturnPose()
     {
         if (PlayerController.instance == null) return;
@@ -184,9 +190,9 @@ public class AbilityManager : MonoBehaviour
         hasReturnPose = true;
         returnPosition = PlayerController.instance.transform.position;
         returnRoomId = RoomManager.instance != null ? RoomManager.instance.CurrentRoomId : null;
-
-        // 리스폰도 같은 지점으로 맞춰 두면, 복귀 직후 떨어져도 조각 근처로 돌아옵니다.
-        PlayerController.instance.GetComponent<PlayerRespawn>()?.SetSpawn(returnPosition);
+        // 리스폰 포인트는 건드리지 않습니다.
+        // 여기서 이전 좌표로 바꿔 두면, 컷씬 도착 직후 낙하/데스존에 닿을 때
+        // 조각 위치로 되돌아가고 카메라만 컷씬에 남는 문제가 납니다.
     }
 
     public void ClearReturnPose()
@@ -195,49 +201,132 @@ public class AbilityManager : MonoBehaviour
         returnRoomId = null;
     }
 
-    void OnSceneLoadCompleted(string sceneName)
+    /// <summary>
+    /// StagePanel에 등록된 해당 스테이지의 컷씬 스폰 오브젝트 위치로 보냅니다.
+    /// </summary>
+    void TeleportToCutscene(int stageIndex)
     {
-        if (pendingStageIntro < 0) return;
+        if (StagePanel.instance == null)
+        {
+            Debug.LogWarning($"{name}: StagePanel이 없어 컷씬 스폰으로 이동하지 못했습니다.", this);
+            return;
+        }
 
-        // 컷씬으로 들어갈 때는 연출을 미룹니다. Prototype 계열로 돌아올 때만 재생합니다.
-        if (sceneName.IndexOf("CutScene", StringComparison.OrdinalIgnoreCase) >= 0) return;
+        Transform spawn = StagePanel.instance.GetCutsceneSpawn(stageIndex);
+        if (spawn == null)
+        {
+            Debug.LogWarning($"{name}: Stage {stageIndex}의 Cutscene Spawn이 비어 있습니다. StagePanel stages를 확인하세요.", this);
+            return;
+        }
 
-        StartCoroutine(PlayPendingStageIntroAfterLoad());
+        Vector3 destination = spawn.position;
+        Transform cameraCenter = StagePanel.instance.GetCutsceneCameraCenter(stageIndex);
+        bool tallRoom = StagePanel.instance.GetCutsceneTallRoom(stageIndex);
+
+        TeleportPlayer(destination);
+        PlayerRespawn respawn = PlayerController.instance.GetComponent<PlayerRespawn>();
+        if (respawn != null)
+        {
+            respawn.SetSpawn(destination);
+            // 텔레포트로 데스존 안에 들어가면 Enter 대신 Stay만 오므로, 도착 직후는 무시합니다.
+            respawn.IgnoreDeathFor(1f);
+        }
+
+        if (CameraSpin.instance != null)
+        {
+            CameraSpin.instance.SetRoom(cameraCenter != null ? cameraCenter.position : destination, tallRoom);
+            CameraSpin.instance.SetFollowPlayer(true);
+        }
+    }
+
+    void TeleportPlayer(Vector3 position)
+    {
+        PlayerController pc = PlayerController.instance;
+        if (pc == null) return;
+
+        if (pc.cc != null) pc.cc.enabled = false;
+        pc.transform.position = position;
+        Physics.SyncTransforms();
+        if (pc.cc != null) pc.cc.enabled = true;
+        pc.ResetVelocity();
     }
 
     /// <summary>
-    /// SceneLoader.OnLoadCompleted는 Open 연출보다 먼저 불립니다.
-    /// 로딩 커튼이 다 걷힌 뒤에 StagePanel을 띄워야 겹치지 않습니다.
+    /// 컷씬 종료 문(ScenenDoor)에서 호출합니다.
+    /// 저장해 둔 위치로 되돌린 뒤 스테이지 연출을 이어 붙입니다.
     /// </summary>
-    IEnumerator PlayPendingStageIntroAfterLoad()
+    public void ReturnFromCutscene()
     {
-        // RoomManager.Start가 이 사이에 조각 위치로 되돌립니다.
-        while (SceneLoader.IsLoading)
-            yield return null;
+        if (isCutsceneTransition) return;
+        if (!hasReturnPose && pendingStageIntro < 0) return;
 
-        yield return null;
+        StartCoroutine(ReturnFromCutsceneRoutine());
+    }
 
-        // RoomManager가 없는 씬이거나 Start 순서가 어긋난 경우 대비입니다.
+    IEnumerator ReturnFromCutsceneRoutine()
+    {
+        isCutsceneTransition = true;
+
+        // 화면을 먼저 덮습니다. 여기서 follow를 끄면 roomCenter(스테이지 방 중심)로
+        // 카메라가 순간 이동해 컷씬이 깨집니다.
+        if (UILoadingPanel.instance != null)
+            yield return UILoadingPanel.instance.CloseAndHold();
+
+        if (StagePanel.instance != null)
+            StagePanel.instance.StopActiveTimeline();
+
         if (hasReturnPose)
         {
+            Vector3 spawnBack = returnPosition;
+
+            // 복귀 좌표로 옮긴 뒤에야 방 중심 카메라로 전환합니다.
+            if (CameraSpin.instance != null)
+                CameraSpin.instance.SetFollowPlayer(false);
+
             if (RoomManager.instance != null)
                 RoomManager.instance.ApplyReturnPose(this);
-            else if (PlayerController.instance != null)
+            else
+                RestoreReturnPoseWithoutRoom();
+
+            PlayerRespawn respawn = PlayerController.instance != null
+                ? PlayerController.instance.GetComponent<PlayerRespawn>()
+                : null;
+            if (respawn != null)
             {
-                var pc = PlayerController.instance;
-                pc.cc.enabled = false;
-                pc.transform.position = returnPosition;
-                pc.cc.enabled = true;
-                pc.ResetVelocity();
-                ClearReturnPose();
+                respawn.SetSpawn(spawnBack);
+                respawn.IgnoreDeathFor(1f);
             }
         }
+        else if (CameraSpin.instance != null)
+        {
+            CameraSpin.instance.SetFollowPlayer(false);
+        }
+
+        // 트리거 잔여 판정이 한 프레임 더 돌 수 있어 한 박자 쉰 뒤 연출을 엽니다.
+        yield return null;
+
+        if (UILoadingPanel.instance != null)
+            yield return UILoadingPanel.instance.Open();
 
         int stageIndex = pendingStageIntro;
         pendingStageIntro = -1;
+        isCutsceneTransition = false;
 
-        if (StagePanel.instance != null)
+        if (stageIndex >= 0 && StagePanel.instance != null)
             StagePanel.instance.StartStageStartAnimation(stageIndex);
+    }
+
+    void RestoreReturnPoseWithoutRoom()
+    {
+        TeleportPlayer(returnPosition);
+
+        if (CameraSpin.instance != null)
+        {
+            CameraSpin.instance.SetFollowPlayer(false);
+            CameraSpin.instance.SetRoom(returnPosition, false);
+        }
+
+        ClearReturnPose();
     }
 
     bool TryGetSublimation()

@@ -94,10 +94,22 @@ public class PlayerAnimator : MonoBehaviour
         anim.SetTrigger(Transform);
     }
 
-    /// <summary>Respawn — 리스폰 (PlayerRespawn)</summary>
+    /// <summary>Respawn — 리스폰 (PlayerRespawn). 컨트롤러에 트리거가 없으면 건너뜁니다.</summary>
     public void PlayRespawn()
     {
-        anim?.SetTrigger(Respawn);
+        if (anim == null) return;
+        if (!HasParameter(Respawn, AnimatorControllerParameterType.Trigger)) return;
+        anim.SetTrigger(Respawn);
+    }
+
+    bool HasParameter(int hash, AnimatorControllerParameterType type)
+    {
+        foreach (var param in anim.parameters)
+        {
+            if (param.type == type && param.nameHash == hash) return true;
+        }
+
+        return false;
     }
 
     /// <summary>Crawl_Idle / Crawl_Move — 기어가기 on·off</summary>

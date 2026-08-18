@@ -17,8 +17,12 @@ public class SendToSpawn : MonoBehaviour
     void Collision(Collider other)
     {
         if (!other.CompareTag("Player")) return;
+        if (AbilityManager.instance != null && AbilityManager.instance.IsCutsceneTransition) return;
         if (isFloor && other.gameObject.layer == LayerMask.NameToLayer("PlatformImmune")) return;
 
-        other.GetComponent<PlayerRespawn>()?.Respawn();
+        PlayerRespawn respawn = other.GetComponent<PlayerRespawn>();
+        if (respawn == null || !respawn.CanRespawn) return;
+
+        respawn.Respawn();
     }
 }
