@@ -8,8 +8,6 @@ public class PlatformAbility : IAbility
 
     public float DrainPerSecond => 5f;
 
-    public bool ProvidesStats => true;
-
     bool active;
     public bool IsActive => active;
 

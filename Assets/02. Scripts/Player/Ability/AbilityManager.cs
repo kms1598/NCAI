@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using UnityEditor.Search;
 using UnityEngine;
 
 public class AbilityManager : MonoBehaviour
@@ -77,6 +76,8 @@ public class AbilityManager : MonoBehaviour
         slots[currentIndex].OnEquip(pc);
         // Anim: AbilityIndex — 초기 형태(None)
         pc.Anim?.SetAbilityIndex(currentIndex);
+
+        ApplyModel();
     }
 
     void Update()
@@ -184,13 +185,7 @@ public class AbilityManager : MonoBehaviour
         OnTransformed?.Invoke(currentIndex);
 
         //능력 사용시 변신 로직, 해당 능력과 일치하는 순서로 모델과 아바타를 지정해야 함
-        foreach(var model in models)
-        {
-            model.gameObject.SetActive(false);
-        }
-
-        if (models[currentIndex] != null) models[currentIndex].gameObject.SetActive(true);
-        if (avatars[currentIndex] != null)  animator.avatar = avatars[currentIndex];
+        ApplyModel();
     }
 
     public void FireCurrent()
@@ -222,7 +217,18 @@ public class AbilityManager : MonoBehaviour
     {
         var cur = slots[currentIndex];
 
-        if (cur.ProvidesStats && cur.IsActive) PlayerController.instance.SetStats(cur.GetStats());
+        if (cur.IsActive) PlayerController.instance.SetStats(cur.GetStats());
         else PlayerController.instance.ResetStats();
+    }
+
+    void ApplyModel()
+    {
+        foreach (var model in models)
+        {
+            model.gameObject.SetActive(false);
+        }
+
+        if (models[currentIndex] != null) models[currentIndex].gameObject.SetActive(true);
+        if (avatars[currentIndex] != null) animator.avatar = avatars[currentIndex];
     }
 }
