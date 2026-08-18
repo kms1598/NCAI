@@ -12,8 +12,8 @@ public class MovementStats
 
     public static MovementStats Default => new MovementStats
     {
-        moveSpeed = 6f,
-        jumpHeight = 1f,
+        moveSpeed = 3f,
+        jumpHeight = 1.5f,
         dashSpeed = 20f,
         dashDuration = 0.2f,
         canJump = true,

@@ -18,7 +18,7 @@ public class CrawlAbility : IAbility
     {
         return new MovementStats
         {
-            moveSpeed = 3f,
+            moveSpeed = 3 * 0.8f,
             jumpHeight = 0f,
             dashSpeed = 0f,
             dashDuration = 0f,

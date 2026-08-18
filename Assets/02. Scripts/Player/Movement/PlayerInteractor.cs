@@ -10,6 +10,12 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (!v.isPressed) return;
 
+        if (DescriptionUI.instance != null && DescriptionUI.instance.IsOpen)
+        {
+            DescriptionUI.instance.Close();
+            return;
+        }
+
         // 대상이 이미 사라졌다면 상호작용하지 않고 상태만 정리합니다.
         if (!IsUsable(current))
         {

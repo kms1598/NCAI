@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using UnityEditor.Search;
 using UnityEngine;
 
 public class AbilityManager : MonoBehaviour
@@ -8,13 +9,15 @@ public class AbilityManager : MonoBehaviour
 
     IAbility[] slots;
     int[] items;
+    public int[] Items => items; 
     int[] maxItems = { 0, 4, 4, 3, 0 };
     bool[] unlocked;
     int selectedIndex;
     int currentIndex;
     public int CurrentIndex => currentIndex;
     const int SUBLIMATION_INDEX = 4;
-
+    bool hasFocus = false;
+        
     /// <summary>승화 형태로 변신해 있는지입니다.</summary>
     public bool IsSublimation => currentIndex == SUBLIMATION_INDEX;
 
@@ -22,6 +25,11 @@ public class AbilityManager : MonoBehaviour
     public Action<int> OnTransformed;
     public Action<int, int> OnGetItem;
     public Action<int> OnUnlocked;
+
+    /// <summary>능력 사용시 각 모델링을 끄고 켜는 식으로 변신을 구현</summary>
+    [SerializeField] GameObject[] models;
+    [SerializeField] Avatar[] avatars;
+    [SerializeField] Animator animator;
 
     void Awake()
     {
@@ -148,23 +156,41 @@ public class AbilityManager : MonoBehaviour
         if (index < 0 || slots.Length <= index) return;
         if (!unlocked[index]) return;
         selectedIndex = index;
+        hasFocus = true;
         AudioManager.Play(SFXKey.CharacterSelect);
         OnSelectionChanged?.Invoke(selectedIndex);
     }
 
     public void Transform()
     {
-        if (selectedIndex == currentIndex) return;
-        if (!unlocked[selectedIndex]) return;
+        int target = hasFocus ? selectedIndex : 0;
+
+        if (target == currentIndex)
+        {
+            hasFocus = false;
+            SelectSlot(0);
+            return;
+        }
+        if (0 < target && !unlocked[selectedIndex]) return;
 
         slots[currentIndex].OnUnequip(PlayerController.instance);
-        currentIndex = selectedIndex;
+        currentIndex = target;
+        hasFocus = false;
         slots[currentIndex].OnEquip(PlayerController.instance);
         RecalStats();
         // Anim: Transform + AbilityIndex — 능력 형태 전환
         PlayerController.instance.Anim?.PlayTransform(currentIndex);
         AudioManager.Play(SFXKey.CharacterChange);
         OnTransformed?.Invoke(currentIndex);
+
+        //능력 사용시 변신 로직, 해당 능력과 일치하는 순서로 모델과 아바타를 지정해야 함
+        foreach(var model in models)
+        {
+            model.gameObject.SetActive(false);
+        }
+
+        if (models[currentIndex] != null) models[currentIndex].gameObject.SetActive(true);
+        if (avatars[currentIndex] != null)  animator.avatar = avatars[currentIndex];
     }
 
     public void FireCurrent()
