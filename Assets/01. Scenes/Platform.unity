@@ -953,6 +953,9 @@ MonoBehaviour:
   playerJoint: {fileID: 1604897002}
   stringHeight: 10
   followSpeed: 3
+  rotationReference: {fileID: 0}
+  followRotation: 1
+  maxFollowLag: 1.5
   curveResolution: 27
   sagAmount: 3
   sagDirection: {x: -1, y: 0, z: 0}
@@ -1817,6 +1820,9 @@ MonoBehaviour:
   playerJoint: {fileID: 1604897002}
   stringHeight: 10
   followSpeed: 3
+  rotationReference: {fileID: 0}
+  followRotation: 1
+  maxFollowLag: 1.5
   curveResolution: 27
   sagAmount: 3
   sagDirection: {x: 1, y: 0, z: 0}
@@ -2880,6 +2886,9 @@ MonoBehaviour:
   playerJoint: {fileID: 1604897002}
   stringHeight: 10
   followSpeed: 3
+  rotationReference: {fileID: 0}
+  followRotation: 1
+  maxFollowLag: 1.5
   curveResolution: 27
   sagAmount: 3
   sagDirection: {x: 0, y: 0, z: 0}
