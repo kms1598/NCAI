@@ -3,7 +3,22 @@ guid: 96e2105caeeefa747b0d9c2c5b434de3
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.001
+    second: {fileID: 2100000, guid: 071a6752c3e505e4eb37e28f254d5c0b, type: 2}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Baked_BaseColor
+    second: {fileID: 2800000, guid: cfe399714bcfc25488d2fe23b2d0c45c, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: normal
+    second: {fileID: 2800000, guid: cbe9b0d1371511640bfdf931874de888, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
