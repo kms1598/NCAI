@@ -8,8 +8,6 @@ public class CrawlAbility : IAbility
 
     public float DrainPerSecond => 3f;
 
-    public bool ProvidesStats => true;
-
     bool active;
     public bool IsActive => active;
 
@@ -45,19 +43,15 @@ public class CrawlAbility : IAbility
 
     void SetActive(PlayerController pc, bool on)
     {
+        if (pc == null) return;
+
+        pc.transform.localScale = on ? Vector3.one * 0.5f : Vector3.one;
+        pc.gameObject.layer = LayerMask.NameToLayer(on ? "Crawling" : "Player");
+        pc.Anim?.SetCrawling(on);
+        if (pc.Footstep != null) pc.Footstep.Muted = on;
+
         active = on;
-        if(on)
-        {
-            pc.cc.height = 0.5f;
-            pc.cc.center = new Vector3(0, 0.25f, 0);
-            pc.gameObject.layer = LayerMask.NameToLayer("Crawling");
-        }
-        else
-        {
-            pc.cc.height = 2f;
-            pc.cc.center = new Vector3(0, 1f, 0);
-            pc.gameObject.layer = LayerMask.NameToLayer("Player");
-        }
+
         // Anim: Crawl_Idle / Crawl_Move — 기어가기 on·off
         pc.Anim?.SetCrawling(on);
 

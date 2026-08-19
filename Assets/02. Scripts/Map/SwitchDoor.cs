@@ -8,7 +8,6 @@ public class SwitchDoor : MonoBehaviour, ISwitchable
     public GameObject closedDoor;
     public GameObject openDoor;
 
-
     public void SetState()
     {
         isOpen = true;

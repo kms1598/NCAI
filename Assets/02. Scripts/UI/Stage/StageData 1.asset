@@ -15,3 +15,4 @@ MonoBehaviour:
   stageNumber: 1
   stageName: "\uD22C\uC0AC"
   bgm: {fileID: 8300000, guid: 04a3626ca1ae5dd44bbb0de11db87f04, type: 3}
+  timeline: {fileID: 11400000, guid: 95feb9ed969cc2e4cafc1a502a3a7d6c, type: 2}

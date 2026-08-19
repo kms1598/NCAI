@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Timeline;
 
 /// <summary>
 /// 스테이지 정보를 담는 ScriptableObject입니다.
@@ -13,8 +14,11 @@ public class StageScriptable : ScriptableObject
     [SerializeField] string stageName;
     [Tooltip("이 스테이지로 들어갈 때 페이드로 바꿀 BGM입니다. 비우면 BGM을 바꾸지 않습니다.")]
     [SerializeField] AudioClip bgm;
+    [Tooltip("컷씬 진입 시 재생할 Timeline입니다. 비우면 타임라인을 재생하지 않습니다.")]
+    [SerializeField] TimelineAsset timeline;
 
     public int StageNumber => stageNumber;
     public string StageName => stageName;
     public AudioClip Bgm => bgm;
+    public TimelineAsset Timeline => timeline;
 }

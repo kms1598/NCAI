@@ -90,7 +90,8 @@ PrefabInstance:
       value: Simple White Desk
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2615818225740828958, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}
@@ -152,7 +153,8 @@ PrefabInstance:
       value: Simple White Desk (7)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2615818225740828958, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}
@@ -214,7 +216,8 @@ PrefabInstance:
       value: Simple White Desk (5)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2615818225740828958, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}
@@ -276,7 +279,8 @@ PrefabInstance:
       value: Simple White Desk (6)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2615818225740828958, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}
@@ -338,7 +342,8 @@ PrefabInstance:
       value: Simple White Desk (4)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2615818225740828958, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}
@@ -400,7 +405,8 @@ PrefabInstance:
       value: Simple White Desk (1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2615818225740828958, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ca8cbb84d03ab94993aad0db02cc92c, type: 3}

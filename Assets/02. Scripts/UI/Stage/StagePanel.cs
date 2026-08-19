@@ -3,12 +3,35 @@ using System.Collections.Generic;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
 public class StagePanel : MonoBehaviour
 {
     public static StagePanel instance;
 
-    [SerializeField] List<StageScriptable> stageScriptable = new List<StageScriptable>();
+    [System.Serializable]
+    public class StageEntry
+    {
+        [Tooltip("Stage Data 에셋입니다.")]
+        public StageScriptable data;
+        [Tooltip("첫 조각 획득 시 플레이어가 이동할 컷씬 스폰 오브젝트입니다.")]
+        public Transform cutsceneSpawn;
+        [Tooltip("카메라 기준점입니다. 비우면 cutsceneSpawn을 씁니다.")]
+        public Transform cutsceneCameraCenter;
+        public bool tallRoom;
+        [Tooltip("이 스테이지 Timeline을 재생할 PlayableDirector입니다. 비우면 아래 공용 Director를 씁니다.")]
+        public PlayableDirector timelineDirector;
+    }
+
+    [Tooltip("스테이지 Data와 컷씬 스폰을 같이 등록합니다.")]
+    [SerializeField] List<StageEntry> stages = new List<StageEntry>();
+
+    // 예전 List<StageScriptable> 직렬화를 stages로 옮기기 위한 필드입니다.
+    [SerializeField, HideInInspector] List<StageScriptable> stageScriptable = new List<StageScriptable>();
+
+    [Tooltip("스테이지별 Director가 없을 때 쓰는 공용 PlayableDirector입니다.")]
+    [SerializeField] PlayableDirector sharedTimelineDirector;
 
     [SerializeField] TextMeshProUGUI stageNumberText;
     [SerializeField] TextMeshProUGUI stageNameText;
@@ -27,6 +50,7 @@ public class StagePanel : MonoBehaviour
     Tween numberTween;
     Tween nameTween;
     Coroutine running;
+    PlayableDirector activeTimelineDirector;
 
     void Awake()
     {
@@ -36,6 +60,28 @@ public class StagePanel : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        MigrateLegacyStages();
+    }
+
+    void OnValidate()
+    {
+        MigrateLegacyStages();
+    }
+
+    void MigrateLegacyStages()
+    {
+        if (stageScriptable == null || stageScriptable.Count == 0) return;
+        if (stages != null && stages.Count > 0) return;
+
+        if (stages == null) stages = new List<StageEntry>();
+
+        for (int i = 0; i < stageScriptable.Count; i++)
+        {
+            stages.Add(new StageEntry { data = stageScriptable[i] });
+        }
+
+        stageScriptable.Clear();
     }
 
     void OnDestroy()
@@ -55,16 +101,16 @@ public class StagePanel : MonoBehaviour
     /// </summary>
     public void StartStageStartAnimation(int stageNumber)
     {
-        StageScriptable data = FindStage(stageNumber);
-        if (data == null)
+        StageEntry entry = FindEntry(stageNumber);
+        if (entry == null || entry.data == null)
         {
-            Debug.LogWarning($"{name}: Stage {stageNumber} 데이터가 없습니다. stageScriptable 목록을 확인하세요.", this);
+            Debug.LogWarning($"{name}: Stage {stageNumber} 데이터가 없습니다. stages 목록을 확인하세요.", this);
             return;
         }
 
+        StageScriptable data = entry.data;
         SetStageInfo(data.StageNumber, data.StageName);
 
-        // 스테이지 BGM이 있으면 기본곡에서 페이드로 넘깁니다.
         if (data.Bgm != null && AudioManager.instance != null)
             AudioManager.instance.PlayBGM(data.Bgm);
 
@@ -72,17 +118,85 @@ public class StagePanel : MonoBehaviour
         running = StartCoroutine(StageStartRoutine());
     }
 
-    StageScriptable FindStage(int stageNumber)
+    /// <summary>컷씬 텔레포트용 스폰 Transform을 반환합니다. 없으면 null입니다.</summary>
+    public Transform GetCutsceneSpawn(int stageNumber)
     {
-        for (int i = 0; i < stageScriptable.Count; i++)
+        StageEntry entry = FindEntry(stageNumber);
+        return entry != null ? entry.cutsceneSpawn : null;
+    }
+
+    /// <summary>컷씬 카메라 기준 Transform을 반환합니다. 없으면 스폰을 씁니다.</summary>
+    public Transform GetCutsceneCameraCenter(int stageNumber)
+    {
+        StageEntry entry = FindEntry(stageNumber);
+        if (entry == null) return null;
+        if (entry.cutsceneCameraCenter != null) return entry.cutsceneCameraCenter;
+        return entry.cutsceneSpawn;
+    }
+
+    public bool GetCutsceneTallRoom(int stageNumber)
+    {
+        StageEntry entry = FindEntry(stageNumber);
+        return entry != null && entry.tallRoom;
+    }
+
+    /// <summary>
+    /// Stage Data에 넣은 Timeline을 재생합니다.
+    /// 컷씬 스폰으로 이동한 뒤 AbilityManager에서 호출합니다.
+    /// </summary>
+    public void PlayStageTimeline(int stageNumber)
+    {
+        StageEntry entry = FindEntry(stageNumber);
+        if (entry == null || entry.data == null) return;
+
+        TimelineAsset timeline = entry.data.Timeline;
+        if (timeline == null) return;
+
+        PlayableDirector director = entry.timelineDirector != null
+            ? entry.timelineDirector
+            : sharedTimelineDirector;
+
+        if (director == null)
         {
-            if (stageScriptable[i] != null && stageScriptable[i].StageNumber == stageNumber)
-                return stageScriptable[i];
+            Debug.LogWarning($"{name}: Stage {stageNumber} Timeline은 있지만 PlayableDirector가 없습니다.", this);
+            return;
         }
 
-        // 번호로 못 찾으면 리스트 인덱스로 한 번 더 시도합니다.
-        if (0 <= stageNumber && stageNumber < stageScriptable.Count)
-            return stageScriptable[stageNumber];
+        StopActiveTimeline();
+
+        if (director.playableAsset != timeline)
+            director.playableAsset = timeline;
+
+        director.time = 0;
+        director.Evaluate();
+        director.Play();
+        activeTimelineDirector = director;
+    }
+
+    /// <summary>재생 중인 스테이지 Timeline을 멈춥니다.</summary>
+    public void StopActiveTimeline()
+    {
+        if (activeTimelineDirector == null) return;
+
+        if (activeTimelineDirector.state == PlayState.Playing)
+            activeTimelineDirector.Stop();
+
+        activeTimelineDirector = null;
+    }
+
+    StageEntry FindEntry(int stageNumber)
+    {
+        if (stages == null) return null;
+
+        for (int i = 0; i < stages.Count; i++)
+        {
+            StageEntry entry = stages[i];
+            if (entry != null && entry.data != null && entry.data.StageNumber == stageNumber)
+                return entry;
+        }
+
+        if (0 <= stageNumber && stageNumber < stages.Count)
+            return stages[stageNumber];
 
         return null;
     }
@@ -92,7 +206,6 @@ public class StagePanel : MonoBehaviour
         KillTweens();
 
         panelTween = canvasGroup.DOFade(0f, 0f);
-        // 알파가 1이면 DOFade로 0까지 내려, 이후 페이드 인이 보이게 합니다.
         if (stageNumberText != null && stageNumberText.color.a >= 1f)
             numberTween = stageNumberText.DOFade(0f, 0f);
         if (stageNameText != null && stageNameText.color.a >= 1f)
