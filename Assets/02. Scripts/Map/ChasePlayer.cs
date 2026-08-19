@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class ChasePlayer : MonoBehaviour
 {
+    static readonly int Run = Animator.StringToHash("Run");
+
     Vector3 startPos;
     Quaternion startRot;
     public Transform player;
@@ -13,16 +15,24 @@ public class ChasePlayer : MonoBehaviour
     [SerializeField] string chaseSfx = SFXKey.Enemy1;
     [Tooltip("추격 범위 경계에서 소리가 겹치지 않도록 두는 최소 간격(초)입니다.")]
     [SerializeField] float chaseSfxCooldown = 4f;
+    [Tooltip("비우면 같은 오브젝트(또는 자식)에서 Animator를 찾습니다.")]
+    [SerializeField] Animator animator;
 
     bool isInit = false;
     bool chasing = false;
     float lastChaseSfxTime = -999f;
+
+    void Awake()
+    {
+        if (animator == null) animator = GetComponentInChildren<Animator>();
+    }
 
     void OnEnable()
     {
         PlayerRespawn.OnRespawn += ResetSelf;
         if (isInit) ResetSelf();
     }
+
     void OnDisable()
     {
         PlayerRespawn.OnRespawn -= ResetSelf;
@@ -34,6 +44,7 @@ public class ChasePlayer : MonoBehaviour
         startRot = transform.localRotation;
         player = PlayerController.instance.gameObject.transform;
         isInit = true;
+        SetRun(false);
     }
 
     void Update()
@@ -47,12 +58,21 @@ public class ChasePlayer : MonoBehaviour
             lastChaseSfxTime = Time.time;
         }
 
+        if (chasing != canChase)
+            SetRun(canChase);
+
         chasing = canChase;
 
         if (!canChase) return;
 
         transform.position += dir * speed * Time.deltaTime;
         transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
+    }
+
+    void SetRun(bool on)
+    {
+        if (animator == null) return;
+        animator.SetBool(Run, on);
     }
 
     bool TryGetChaseDirection(out Vector3 dir)
@@ -73,10 +93,11 @@ public class ChasePlayer : MonoBehaviour
         return true;
     }
 
-    private void ResetSelf()
+    void ResetSelf()
     {
         transform.localPosition = startPos;
         transform.localRotation = startRot;
         chasing = false;
+        SetRun(false);
     }
 }

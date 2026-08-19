@@ -23,6 +23,7 @@ public class PlayerAnimator : MonoBehaviour
     static readonly int AbilityIndex = Animator.StringToHash("AbilityIndex");
     static readonly int IsCrawling = Animator.StringToHash("IsCrawling");
     static readonly int IsPlatform = Animator.StringToHash("IsPlatform");
+    static readonly int Locomotion = Animator.StringToHash("Locomotion");
 
     [Tooltip("이동 블렌드 파라미터 감쇠 시간. 클수록 방향 전환이 부드럽습니다")]
     [SerializeField] float moveDampTime = 0.12f;
@@ -128,5 +129,17 @@ public class PlayerAnimator : MonoBehaviour
     public void SetAbilityIndex(int index)
     {
         anim?.SetInteger(AbilityIndex, index);
+    }
+
+    /// <summary>
+    /// 능력 변신으로 아바타가 바뀌면 Animator가 기본 상태(Stand Up)로 리셋됩니다.
+    /// 그때 Locomotion으로 바로 넘겨 일어서기 연출을 건너뜁니다.
+    /// </summary>
+    public void SkipToLocomotion()
+    {
+        if (anim == null) return;
+
+        anim.Play(Locomotion, 0, 0f);
+        anim.Update(0f);
     }
 }

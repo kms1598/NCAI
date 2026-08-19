@@ -11,7 +11,8 @@ public enum GameScene
 {
     Logo = 0,
     Title = 1,
-    Prototype = 2
+    Prototype = 2,
+    Ending = 3
 }
 
 /// <summary>
@@ -31,7 +32,7 @@ public class SceneLoader : MonoBehaviour
     public static event Action<string> OnLoadCompleted;
 
     [Tooltip("이 씬으로 갈 때는 플레이어와 진행 상황도 함께 정리합니다. 로고나 타이틀로 돌아갈 때 필요합니다.")]
-    [SerializeField] GameScene[] resetScenes = { GameScene.Logo, GameScene.Title };
+    [SerializeField] GameScene[] resetScenes = { GameScene.Logo, GameScene.Title, GameScene.Ending };
     [Tooltip("UILoadingPanel의 Close/Open 연출로 화면을 덮고 걷어냅니다. 패널이 없으면 그냥 바로 전환합니다.")]
     [SerializeField] bool useLoadingPanel = true;
 
@@ -70,8 +71,11 @@ public class SceneLoader : MonoBehaviour
 
         SceneLoader loader = Ensure();
 
-        // 타이틀처럼 게임 진행을 처음부터 시작해야 하는 씬이면 남아 있는 싱글톤도 정리합니다.
-        bool reset = 0 <= Array.IndexOf(loader.resetScenes, scene);
+        // 타이틀·엔딩처럼 게임 진행을 처음부터 시작해야 하는 씬이면 남아 있는 싱글톤도 정리합니다.
+        bool reset = 0 <= Array.IndexOf(loader.resetScenes, scene)
+            || scene == GameScene.Ending
+            || scene == GameScene.Logo
+            || scene == GameScene.Title;
 
         loader.Begin(sceneName, reset);
     }
@@ -133,6 +137,7 @@ public class SceneLoader : MonoBehaviour
             case GameScene.Logo: return "LogoScene";
             case GameScene.Title: return "TitleScene";
             case GameScene.Prototype: return "PrototypeScene";
+            case GameScene.Ending: return "EndingScene";
             default: return null;
         }
     }

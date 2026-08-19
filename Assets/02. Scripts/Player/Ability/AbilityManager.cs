@@ -371,8 +371,9 @@ public class AbilityManager : MonoBehaviour
         AudioManager.Play(SFXKey.CharacterChange);
         OnTransformed?.Invoke(currentIndex);
 
-        //능력 사용시 변신 로직, 해당 능력과 일치하는 순서로 모델과 아바타를 지정해야 함
-        ApplyModel();
+        // 능력 사용시 변신 로직, 해당 능력과 일치하는 순서로 모델과 아바타를 지정해야 함
+        // 아바타 교체 시 Animator가 기본 상태(Stand Up)로 돌아가므로 건너뜁니다.
+        ApplyModel(skipStandUp: true);
     }
 
     public void FireCurrent()
@@ -408,7 +409,7 @@ public class AbilityManager : MonoBehaviour
         else PlayerController.instance.ResetStats();
     }
 
-    void ApplyModel()
+    void ApplyModel(bool skipStandUp = false)
     {
         foreach (var model in models)
         {
@@ -417,5 +418,12 @@ public class AbilityManager : MonoBehaviour
 
         if (models[currentIndex] != null) models[currentIndex].gameObject.SetActive(true);
         if (avatars[currentIndex] != null) animator.avatar = avatars[currentIndex];
+
+        // 아바타 교체 시 기본 상태(Stand Up)로 리셋되므로, 변신 시에만 Locomotion으로 넘깁니다.
+        if (skipStandUp && animator != null)
+        {
+            animator.Play("Locomotion", 0, 0f);
+            animator.Update(0f);
+        }
     }
 }

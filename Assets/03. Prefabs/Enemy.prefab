@@ -144,6 +144,9 @@ MonoBehaviour:
   speed: 5
   chaseRange: 2
   yTolerance: 0.001
+  chaseSfx: sfx_enemy_1
+  chaseSfxCooldown: 4
+  animator: {fileID: 0}
 --- !u!54 &1110751492116996844
 Rigidbody:
   m_ObjectHideFlags: 0

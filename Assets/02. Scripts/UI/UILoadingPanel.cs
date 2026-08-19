@@ -86,12 +86,46 @@ public class UILoadingPanel : MonoBehaviour
         if (canvas == null) return;
 
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.worldCamera = null;
         // 다른 UI보다 위에 덮여야 로딩 연출이 가려지지 않습니다.
         if (canvas.sortingOrder < 1000) canvas.sortingOrder = 1000;
 
         // 에디터에서 Scale이 (0,0,0)으로 저장된 경우가 있어, 그대로면 알파와 무관하게 안 보입니다.
         if (canvas.transform.localScale == Vector3.zero)
             canvas.transform.localScale = Vector3.one;
+
+        // Screen Space Camera용으로 찌그러져 저장된 Loading 자식을 전체 화면으로 고칩니다.
+        FixLoadingChildForOverlay();
+    }
+
+    /// <summary>연출 직전에 스케일/오버레이가 깨져 있으면 다시 맞춥니다.</summary>
+    void EnsureReadyToShow()
+    {
+        if (!gameObject.activeSelf)
+            gameObject.SetActive(true);
+
+        EnsureOverlayCanvas();
+
+        if (canvasGroup == null)
+            canvasGroup = GetComponentInChildren<CanvasGroup>(true);
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>(true);
+    }
+
+    void FixLoadingChildForOverlay()
+    {
+        if (canvasGroup == null) return;
+
+        RectTransform rt = canvasGroup.transform as RectTransform;
+        if (rt == null) return;
+
+        rt.localRotation = Quaternion.identity;
+        rt.localScale = Vector3.one;
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.anchoredPosition = Vector2.zero;
+        rt.sizeDelta = Vector2.zero;
+        rt.pivot = new Vector2(0.5f, 0.5f);
     }
 
     /// <summary>
@@ -100,6 +134,7 @@ public class UILoadingPanel : MonoBehaviour
     /// </summary>
     public Coroutine Open()
     {
+        EnsureReadyToShow();
         return Restart(OpenRoutine());
     }
 
@@ -114,6 +149,7 @@ public class UILoadingPanel : MonoBehaviour
     /// </summary>
     public Coroutine Close(float holdDuration)
     {
+        EnsureReadyToShow();
         return Restart(CloseRoutine(holdDuration));
     }
 
@@ -123,6 +159,7 @@ public class UILoadingPanel : MonoBehaviour
     /// </summary>
     public Coroutine CloseAndHold()
     {
+        EnsureReadyToShow();
         return Restart(CloseRoutine(-1f));
     }
 
